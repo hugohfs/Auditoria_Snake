@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+  <string name="mode_ready">Snake\nPresioni Amunt per\nComençar</string>
+  <string name="mode_pause">Pausa\nPresioni Amunt per\nContinuar</string>
+  <string name="mode_lose_prefix">Joc Acabat\nPuntuació: </string>
+  <string name="mode_lose_suffix">\nPresioni Amunt per\nComençar</string>
+
+    <string name="snake_layout_text_text"></string>
+</resources>

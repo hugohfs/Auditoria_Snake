@@ -413,6 +413,9 @@ public class SnakeView extends TileView {
             newHead = new Coordinate(head.x, head.y + 1);
             break;
         }
+        default:
+        	Log.e(TAG, "Some error in switch mDirection. Method updateSnake");
+        	break;
         }
 
         if ((newHead.x < 1) || (newHead.y < 1) || (newHead.x > mXTileCount - 2)

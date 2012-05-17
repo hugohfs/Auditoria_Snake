@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-  <string name="mode_ready">Snake\nPresione Arriba para\nEmpezar</string>
-  <string name="mode_pause">Pausa\nPresione Arriba para\nContinuar</string>
-  <string name="mode_lose_prefix">Juego Terminado\nPuntiación: </string>
-  <string name="mode_lose_suffix">\nPresione Arriba para\nEmpezar</string>
+  <string name="mode_ready">Snake\nPress Up to\nStart</string>
+  <string name="mode_pause">Pause\nPress Up to\nContinue</string>
+  <string name="mode_lose_prefix">Game Over\nScore: </string>
+  <string name="mode_lose_suffix">\nPress Up to\nStart</string>
 
     <string name="snake_layout_text_text"></string>
 </resources>
