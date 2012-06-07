@@ -22,6 +22,12 @@ import android.view.View;
  */
 public class TileView extends View {
 
+    /**
+     * Parámetros que controlan el tamaño de los cuadros de juego (tiles) y su área de distribución 
+     * dentro de vista. Anchura/Altura estan en píxeles, y objetos dibujables se escalan para ajustarse 
+     * a estas dimensiones. X/Y Tile Counts son el número tiles que se dibujaran.
+     */
+	
     protected static int mTileSize;
 
     protected static int mXTileCount;
@@ -30,9 +36,18 @@ public class TileView extends View {
     private static int mXOffset;
     private static int mYOffset;
 
-
+    /**
+     * Un hash que mapea enteros manejables especificados por el subclasser para el 
+     * drawable que serà usado para aquella referencia 
+     * A hash that maps integer handles specified by the subclasser to the
+     * drawable that will be used for that reference
+     */
     private Bitmap[] mTileArray; 
 
+    /**
+     * Una array bidimensional de enteros en los que el número representa el índice 
+     * de la tile (cuadro de juego) que debe ser dibujado en aquellas localizaciones
+     */
     private int[][] mTileGrid;
 
     private final Paint mPaint = new Paint();
@@ -61,7 +76,7 @@ public class TileView extends View {
     
     /**
      * Reinicia el array interno de Bitmaps utilizado para dibujar tiles,
-     * y define el índice màximo de tiles a ser insertadas
+     * y define el índice máximo de tiles a ser insertadas
      * 
      * @param tilecount
      */
@@ -99,6 +114,10 @@ public class TileView extends View {
         mTileArray[key] = bitmap;
     }
 
+    /**
+     * Reinicia todas las tiles a 0 (vacio)
+     * 
+     */
     public void clearTiles() {
         for (int x = 0; x < mXTileCount; x++) {
             for (int y = 0; y < mYTileCount; y++) {

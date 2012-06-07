@@ -29,12 +29,21 @@ public class SnakeView extends TileView {
 
     private static final String TAG = "SnakeView";
 
+    /**
+     * El modo actual de aplicación: READY para correr, RUNNING, o que han perdido ya. 
+     * Se utiliza enteros estáticos finales en lugar de una enumeración por motivos de rendimiento.
+     * 
+     */
     private int mMode = READY;
     public static final int PAUSE = 0;
     public static final int READY = 1;
     public static final int RUNNING = 2;
     public static final int LOSE = 3;
 
+    /**
+     * Dirección actual hacia donde se dirige la serpiente.
+     * 
+     */
     private int mDirection = NORTH;
     private int mNextDirection = NORTH;
     private static final int NORTH = 1;
@@ -42,6 +51,10 @@ public class SnakeView extends TileView {
     private static final int EAST = 3;
     private static final int WEST = 4;
 
+    /**
+     * Las etiquetas de los objetos dibujables que se cargarán en la clase TileView
+     * 
+     */
     private static final int PURPLE_ICON = 1;
     private static final int HEAD_SNAKE = 2;
     private static final int ZONE_ICON = 3;
@@ -119,6 +132,22 @@ public class SnakeView extends TileView {
     	super(context, attrs, defStyle);
     	initSnakeView();
     }
+    
+    public int getmNextDirection() {
+    	return this.mNextDirection;
+    }
+    
+    public void setmNextDirection(int mNextDir) {
+    	this.mNextDirection = mNextDir;
+    }
+    
+    public int getmDirection() {
+    	return this.mDirection;
+    }
+    
+    public void setmDirection(int mDir) {
+    	this.mDirection = mDir;
+    }
 
     private void initSnakeView() {
         setFocusable(true);
@@ -138,6 +167,8 @@ public class SnakeView extends TileView {
         mSnakeTrail.clear();
         mAppleList.clear();
 
+        // Se carga la seriente que viene del este y que ha girado
+        // hacia el norte
         
         mSnakeTrail.add(new Coordinate(7, 7));
         mSnakeTrail.add(new Coordinate(6, 7));
@@ -147,6 +178,7 @@ public class SnakeView extends TileView {
         mSnakeTrail.add(new Coordinate(2, 7));
         mNextDirection = NORTH;
 
+        // Dos manzanas para empezar
         addRandomApple();
         addRandomApple();
 
@@ -154,7 +186,14 @@ public class SnakeView extends TileView {
         mScore = 0;
     }
 
-
+    /**
+     * Dado un ArrayList de coordenadas, necesitamos aplastarla en un array de 
+     * enteros antes de que podamos meterlos en un mapa para reducirla y almacenarla. 
+     * 
+     * @param cvec : un ArrayList de objetos Coordinate
+     * @return : un simple array que contiene valores x/y de las coordenadas
+     * como [x1,y1,x2,y2,x3,y3...]
+     */
     private int[] coordArrayListToArray(ArrayList<Coordinate> cvec) {
         int count = cvec.size();
         int[] rawArray = new int[count * 2];
@@ -186,6 +225,13 @@ public class SnakeView extends TileView {
         return map;
     }
 
+    /**
+     * Dada un array reducida de pares de coordenadas, la reconstituimos
+     * en un ArrayList de objetos Coordinate  
+     * 
+     * @param rawArray : [x1,y1,x2,y2,...]
+     * @return un ArrayList de Coordinates
+     */
     private ArrayList<Coordinate> coordArrayToArrayList(int[] rawArray) {
         ArrayList<Coordinate> coordArrayList = new ArrayList<Coordinate>();
 
@@ -213,11 +259,21 @@ public class SnakeView extends TileView {
         mSnakeTrail = coordArrayToArrayList(icicle.getIntArray("mSnakeTrail"));
     }
 
+    /*
+     * Maneja la puslasion de la teclas durante el juego. Actualiza la direccion 
+     * en la que nuestra serpiente esta viajando basandose en el DPAD. Ignora
+     * los eventos que hacen que la serpiente gire sobre si misma (cambio de sentido).
+     * 
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent msg) {
 
         if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
             if (mMode == READY | mMode == LOSE) {
+                /*
+                 * Al comienzo del juego, o al final de un ejercicio anterior,
+                 * debemos iniciar un nuevo juego.
+                 */
                 initNewGame();
                 setMode(RUNNING);
                 update();
@@ -225,6 +281,9 @@ public class SnakeView extends TileView {
             }
 
             if (mMode == PAUSE) {
+                /*
+                 * Si el juego estava en pausa, debe seguir donde lo dejamos.
+                 */
                 setMode(RUNNING);
                 update();
                 return (true);
@@ -314,18 +373,19 @@ public class SnakeView extends TileView {
         Coordinate newCoord = null;
         boolean found = false;
         while (!found) {
+            // Elige una nueva localización para nuestra manzana
             int newX = 1 + RNG.nextInt(mXTileCount - 2);
             int newY = 1 + RNG.nextInt(mYTileCount - 2);
             newCoord = new Coordinate(newX, newY);
 
-            boolean collision = false;
+            // Se asegura que la localización nueva no esta ocupada por la serpiente
+            found = true;
             int snakelength = mSnakeTrail.size();
             for (int index = 0; index < snakelength; index++) {
                 if (mSnakeTrail.get(index).equals(newCoord)) {
-                    collision = true;
+                	found = false;
                 }
             }
-            found = !collision;
         }
         if (newCoord == null) {
             Log.e(TAG, "Somehow ended up with a null newCoord!");
@@ -356,7 +416,7 @@ public class SnakeView extends TileView {
     }
 
     /**
-     * Dijuba algunas paredes.
+     * Dibuja paredes.
      * 
      */
     private void updateWalls() {
@@ -391,6 +451,7 @@ public class SnakeView extends TileView {
     private void updateSnake() {
         boolean growSnake = false;
 
+        // toma la serpiente por la cabeza
         Coordinate head = mSnakeTrail.get(0);
         Coordinate newHead = new Coordinate(1, 1);
 
@@ -418,37 +479,23 @@ public class SnakeView extends TileView {
         	break;
         }
 
-        if ((newHead.x < 1) || (newHead.y < 1) || (newHead.x > mXTileCount - 2)
-                || (newHead.y > mYTileCount - 2)) {
-            setMode(LOSE);
-            return;
+        //Detectar colisiones
+        detectColision(newHead);
+        detectColisionWithSanke(newHead);
 
-        }
+        // Buscar manzanas
+        growSnake = searchApples(newHead);
 
-        int snakelength = mSnakeTrail.size();
-        for (int snakeindex = 0; snakeindex < snakelength; snakeindex++) {
-            Coordinate c = mSnakeTrail.get(snakeindex);
-            if (c.equals(newHead)) {
-                setMode(LOSE);
-                return;
-            }
-        }
+        // ponemos una nueva cabeza en el ArrayList y sacamos una unidad de la cola
+        updateSnakeHead(growSnake,newHead);
+    }
 
-        int applecount = mAppleList.size();
-        for (int appleindex = 0; appleindex < applecount; appleindex++) {
-            Coordinate c = mAppleList.get(appleindex);
-            if (c.equals(newHead)) {
-                mAppleList.remove(c);
-                addRandomApple();
-                
-                mScore++;
-                mMoveDelay *= 0.9;
-
-                growSnake = true;
-            }
-        }
-
+    /*
+     * Añade una nueva cabeza en el ArrayList y resta una unidad de la cola
+     */
+     private void updateSnakeHead(Boolean growSnake, Coordinate newHead) {
         mSnakeTrail.add(0, newHead);
+        // excepto si queremos que la serpiente crezca
         if (!growSnake) {
             mSnakeTrail.remove(mSnakeTrail.size() - 1);
         }
@@ -462,35 +509,55 @@ public class SnakeView extends TileView {
             }
             index++;
         }
+	}
 
-    }
-
-    /**
-     * Una clase simple que contiene dos valores enteros y función de comparación.
-     * 
-     * Simple class containing two integer values and a comparison function.
-     * Se utiliza para manejar las coordenadas de la serpiente y de las manzanas.
+	/*
+     * Buscar manzanas
      */
-    private class Coordinate {
-        public int x;
-        public int y;
+    private boolean searchApples(Coordinate newHead) {
+        int applecount = mAppleList.size();
+        for (int appleindex = 0; appleindex < applecount; appleindex++) {
+            Coordinate c = mAppleList.get(appleindex);
+            if (c.equals(newHead)) {
+                mAppleList.remove(c);
+                addRandomApple();
+                
+                mScore++;
+                mMoveDelay *= 0.9;
 
-        public Coordinate(int newX, int newY) {
-            x = newX;
-            y = newY;
-        }
-
-        public boolean equals(Coordinate other) {
-            if (x == other.x && y == other.y) {
                 return true;
             }
-            return false;
         }
+		return false;
+	}
 
-        @Override
-        public String toString() {
-            return "Coordinate: [" + x + "," + y + "]";
+	/*
+     *  Busca colisiones con la serpiente misma
+     */
+    private void detectColisionWithSanke(Coordinate newHead) {
+        int snakelength = mSnakeTrail.size();
+        for (int snakeindex = 0; snakeindex < snakelength; snakeindex++) {
+            Coordinate c = mSnakeTrail.get(snakeindex);
+            if (c.equals(newHead)) {
+                setMode(LOSE);
+                return;
+            }
         }
-    }
+		
+	}
+
+	/*
+     *  Detección de una colisión
+     *  En este caso tenemos una pared de grosor de una unidad alrededor del jardin
+     */
+    private void detectColision(Coordinate newHead) {
+        if ((newHead.x < 1) || (newHead.y < 1) || (newHead.x > mXTileCount - 2)
+                || (newHead.y > mYTileCount - 2)) {
+            setMode(LOSE);
+            return;
+
+        }
+		
+	}
     
 }

@@ -27,6 +27,11 @@ public class Snake extends Activity {
     
     private static String ICICLE_KEY = "snake-view";
 
+    /**
+     * Función llamada quando la actividad se crea. Desactiva la barra de título, 
+     * establece las vistas de contenido, y lanza el SnakeView.
+     * 
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +42,10 @@ public class Snake extends Activity {
         mSnakeView.setTextView((TextView) findViewById(R.id.text));
 
         if (savedInstanceState == null) {
+            // Puesta en marcha - creación de un juego nuevo
             mSnakeView.setMode(SnakeView.READY);
         } else {
+            // Inicio de restauración del juego
             Bundle map = savedInstanceState.getBundle(ICICLE_KEY);
             if (map != null) {
                 mSnakeView.restoreState(map);
@@ -51,11 +58,13 @@ public class Snake extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        // Pausa el juego junto con la actividad
         mSnakeView.setMode(SnakeView.PAUSE);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        //Almacena el estado del juego
         outState.putBundle(ICICLE_KEY, mSnakeView.saveState());
     }
 
